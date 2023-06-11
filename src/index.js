@@ -1,62 +1,60 @@
+import throttl from "lodash.throttle";
 
-import throttle from  "lodash.throttle";
 
-const ref = {
-form : document.querySelector('.feedback-form'),
-email :  document.querySelector(`input[name="email"]`),
+const ref =
+{ 
+form : document.querySelector(`.feedback-form`),
+email : document.querySelector(`input[name="email"]`),
 message : document.querySelector(`textarea[name="message"]`)
 };
+const KEYS_NAME = {
+    email : `ref_email`,
+    message : `ref_message`
+};
 
+ref.form.addEventListener('submit', sendForm )
+ref.email.addEventListener(`input`, throttl(sendemail, 500))
+ref.message.addEventListener(`input`,throttl(sendMessage, 500))
 
-const STORAGE_KEYS = {
-    email: 'review_email',
-    messageRev: 'review_msg',
-  };
-
-
-ref.form.addEventListener("submit", onFormSubmit )
-ref.email.addEventListener("input", throttle(onEmailInput, 11500));
-ref.message.addEventListener("input", throttle(onTextAreaInput, 500));
-
-
-populateTexarea();
-
-populateEmail();
-
-function onFormSubmit(evt){
+function sendForm (evt) { 
     evt.preventDefault();
-    const formData = {
-       email : ref.email.value,
-      message : ref.message.value 
+    const formDate = {
+        email : ref.email.value,
+        message : ref.message.value 
+    };
+    if(formDate.email == "" || formDate.message == ""){
+        return
+    };
+    evt.target.reset()
+    console.log(formDate);
+localStorage.removeItem(KEYS_NAME.email)
+localStorage.removeItem(KEYS_NAME.message)
 };
-console.log(formData)
-evt.target.reset()
-localStorage.removeItem(STORAGE_KEYS.email);
-localStorage.removeItem(STORAGE_KEYS.messageRev);
-};
+getEmail ();
+getMessage ();
 
-
-
-function onEmailInput(evt){
-    const messageRev = evt.target.value;
-    localStorage.setItem(STORAGE_KEYS.email, messageRev);
-};
-
-function onTextAreaInput(evt){
-    const messageRev = evt.target.value;
-    localStorage.setItem(STORAGE_KEYS.messageRev, messageRev );
+function sendemail (evt) { 
+    const emailData = evt.target.value
+    localStorage.setItem(KEYS_NAME.email, emailData)
 };
 
-function populateEmail(){
-    const saveEmail = localStorage.getItem(STORAGE_KEYS.email);
-    if (saveEmail){
-        ref.email.value = saveEmail
+
+function sendMessage (evt) { 
+    const messageDate = evt.target.value;
+    localStorage.setItem(KEYS_NAME.message, messageDate)
+};
+
+function getEmail () {
+    const emailav = localStorage.getItem(KEYS_NAME.email);
+    if(emailav) { 
+        ref.email.value = emailav
     }
-}
+};
 
-function populateTexarea(){
-    const saveTextarea = localStorage.getItem(STORAGE_KEYS.messageRev)
-    if (saveTextarea){
-        ref.message.value = saveTextarea
+
+function getMessage (){
+    const messageev = localStorage.getItem(KEYS_NAME.message);
+    if(messageev){
+        ref.message.value = messageev
     }
 }
